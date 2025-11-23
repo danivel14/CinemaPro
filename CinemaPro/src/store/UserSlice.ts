@@ -17,12 +17,14 @@ const userSlice = createSlice({
     initialState,
     reducers: {
        
+        // para loguearse
         setUser: (state, action: PayloadAction<{ name: string; email: string }>) => {
             state.name = action.payload.name;
             state.email = action.payload.email;
             state.isAuthenticated = true;
         },
        
+        // para salir
         logout: () => initialState,
     },
 });

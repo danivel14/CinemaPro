@@ -1,7 +1,13 @@
 export type RootStackParamList = {
   Auth: undefined;
-  Main: undefined; // Tab Navigator
-  Details: { movieId: string; title: string }; // Detalles de la película
+  Register: undefined;  
+  Main: undefined;      // HomeScreen
+  Details: {           
+    movieId: string; 
+    title: string; 
+    poster?: string; 
+    genre?: string; 
+  };
   Booking: { movieTitle: string };
   Snacks: undefined;
 };

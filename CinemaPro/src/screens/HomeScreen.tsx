@@ -87,6 +87,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: { 
     color: colors.secondary, 
+    color: colors.secondary, // color secundario para resaltar el nombre
     fontSize: 18, 
     marginBottom: 20 
   },

@@ -7,6 +7,7 @@ import { CustomButton } from '../components/CustomButton';
 import { colors } from '../theme/colors';
 
 
+// para identificar las filas
 const ROW_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 export const BookingScreen = () => {
@@ -14,6 +15,7 @@ export const BookingScreen = () => {
   const route = useRoute<any>();
   
   
+  // el título de la película desde la navegación anterior
   const { movieTitle } = route.params || { movieTitle: 'Película' };
 
   const dispatch = useAppDispatch();
@@ -40,12 +42,37 @@ export const BookingScreen = () => {
   
   const handleContinue = () => {
     
+  // Estado de los asientos (Matriz 4x6)
+  // 0: Libre, 1: Ocupado (No disponible), 2: Seleccionado (Por ti)
+  const [seats, setSeats] = useState([
+    [0, 0, 1, 1, 0, 0], // Fila A
+    [0, 0, 0, 0, 0, 0], // Fila B
+    [1, 1, 0, 0, 1, 1], // Fila C
+    [0, 2, 2, 0, 0, 0], // Fila D
+  ]);
+
+  // seleccionar/deseleccionar
+  const toggleSeat = (rowIndex: number, colIndex: number) => {
+    const newSeats = [...seats]; // Copia del estado
+    const currentStatus = newSeats[rowIndex][colIndex];
+    
+    if (currentStatus === 1) return; // Si está ocupado, no hace nada
+
+    // Si está libre (0) pasa a seleccionado (2), y viceversa
+    newSeats[rowIndex][colIndex] = currentStatus === 0 ? 2 : 0;
+    setSeats([...newSeats]); // Actualizamos estado
+  };
+
+  // para procesar la compra y guardar en Redux
+  const handleContinue = () => {
+    // para convertir la matriz visual en un array de textos (Ej: ["D2", "D3"])
     const selectedSeatsList: string[] = [];
 
     seats.forEach((row, rowIndex) => {
       row.forEach((status, colIndex) => {
         if (status === 2) {
           
+          // ROW_LETTERS[0] es 'A', colIndex+1 es el número
           const seatName = `${ROW_LETTERS[rowIndex]}${colIndex + 1}`;
           selectedSeatsList.push(seatName);
         }
@@ -53,6 +80,7 @@ export const BookingScreen = () => {
     });
 
     
+    // Debe haber al menos 1 asiento
     if (selectedSeatsList.length === 0) {
       Alert.alert('Atención', 'Por favor selecciona al menos un asiento.');
       return;
@@ -101,6 +129,32 @@ export const BookingScreen = () => {
           ))}
         </View>
 
+
+        {/* Grid de Asientos */}
+        <View style={styles.gridContainer}>
+          {seats.map((row, rowIndex) => (
+            <View key={rowIndex} style={styles.rowContainer}>
+              {/* Letra de la fila a la izquierda */}
+              <Text style={styles.rowLabel}>{ROW_LETTERS[rowIndex]}</Text>
+              
+              <View style={styles.seatsRow}>
+                {row.map((status, colIndex) => (
+                  <TouchableOpacity
+                    key={`${rowIndex}-${colIndex}`}
+                    onPress={() => toggleSeat(rowIndex, colIndex)}
+                    style={[
+                      styles.seat,
+                      status === 1 && styles.seatOccupied, // Estilo ocupado
+                      status === 2 && styles.seatSelected, // Estilo seleccionado
+                    ]}
+                    disabled={status === 1} // Deshabilitar click si está ocupado
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
+        </View>
+
         {/* Leyenda (Significado de colores) */}
         <View style={styles.legendContainer}>
           <View style={styles.legendItem}>
@@ -136,6 +190,7 @@ const styles = StyleSheet.create({
   subtitle: { color: colors.textDim, fontSize: 18, marginBottom: 30 },
 
   
+  // Pantalla curvada visual
   screenContainer: { alignItems: 'center', marginBottom: 30, width: '100%' },
   screenLine: { 
     width: '80%', height: 5, backgroundColor: colors.primary, 
@@ -161,6 +216,18 @@ const styles = StyleSheet.create({
   seatSelected: { backgroundColor: colors.secondary }, 
 
  
+  // Asientos individuales
+  seat: {
+    width: 32, height: 32,
+    backgroundColor: '#3A3A3A', // Color Libre 
+    marginHorizontal: 4,
+    borderRadius: 6,
+    borderTopLeftRadius: 10, borderTopRightRadius: 10 // Forma de silla
+  },
+  seatOccupied: { backgroundColor: '#1A1A1A', borderColor: '#333', borderWidth: 1 }, // indica Ocupado (Casi negro)
+  seatSelected: { backgroundColor: colors.secondary }, // indica Seleccionado (Naranja)
+
+  // Leyenda
   legendContainer: { flexDirection: 'row', justifyContent: 'space-evenly', width: '100%', marginTop: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   legendText: { color: colors.textDim, fontSize: 12 },

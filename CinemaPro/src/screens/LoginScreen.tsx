@@ -5,6 +5,7 @@ import { CustomInput } from '../components/CustomInput';
 import { CustomButton } from '../components/CustomButton';
 import { useAppDispatch } from '../store/hooks'; 
 import { setUser } from '../store/UserSlice';
+import { login } from '../store/authSlice';
 import { colors } from '../theme/colors';
 
 export const LoginScreen = () => {
@@ -38,6 +39,7 @@ export const LoginScreen = () => {
    const handleLogin = () => {
     if (validate()) {
       dispatch(setUser({ 
+      dispatch(login({ 
         name: 'Usuario Cine', 
         email: email 
       }));
