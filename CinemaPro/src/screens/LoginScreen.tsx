@@ -88,7 +88,7 @@ export const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../../assets/icon.png')} 
+        source={require('../../assets/logo_app.png')} 
         style={styles.logo}
         resizeMode="contain"
       />
@@ -161,7 +161,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 20,
-    tintColor: colors.primary,
   },
   title: {
     fontSize: 32,
