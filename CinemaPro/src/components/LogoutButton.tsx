@@ -57,10 +57,10 @@ const styles = StyleSheet.create({
     borderColor: '#444'
   },
   icon: {
-    width: 16,
+    width: 8,
     height: 16,
     tintColor: colors.error, // Rojo para acción de salida
-    marginRight: 6
+    marginRight: 16
   },
   text: {
     color: colors.text,
