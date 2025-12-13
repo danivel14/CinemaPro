@@ -7,6 +7,7 @@ import { useAppDispatch } from '../store/hooks';
 import { setBookingDetails } from '../store/bookingSlice';
 import { CustomButton } from '../components/CustomButton';
 import { colors } from '../theme/colors';
+import { errorMessageValidation } from '../utils/errorHandling';
 
 const ROW_LETTERS = ['A', 'B', 'C', 'D', 'E', 'F'];
 const SHOWTIMES = ['14:00', '16:30', '19:00', '21:30', '23:00'];
@@ -42,7 +43,7 @@ export const BookingScreen = () => {
       setMySelectedSeats([]); // Limpiar mi selección al cambiar hora
       
       try {
-        // ID Único para el documento: "Pelicula_Horario" (Ej: Frankenstein_14:00)
+        // ID Único para el documento: "Pelicula_Horario" 
         const docID = `${movieTitle.replace(/\s+/g, '_')}_${selectedTime}`;
         
         const docRef = doc(db, "showtimes", docID);
@@ -56,8 +57,7 @@ export const BookingScreen = () => {
           setOccupiedFromDB([]);
         }
       } catch (error) {
-        console.error("Error cargando asientos:", error);
-        Alert.alert("Error", "No se pudo verificar la disponibilidad de la sala.");
+         errorMessageValidation(error, "Error de Reserva");
       } finally {
         setLoadingSeats(false);
       }
@@ -86,7 +86,7 @@ export const BookingScreen = () => {
     }
   };
 
-  // --- DETERMINAR ESTADO VISUAL DE UN ASIENTO ---
+  // --- ESTADO VISUAL DE UN ASIENTO ---
   const getSeatStatus = (rowIndex: number, colIndex: number) => {
     const seatName = `${ROW_LETTERS[rowIndex]}${colIndex + 1}`;
     
@@ -115,12 +115,10 @@ export const BookingScreen = () => {
       }, { merge: true });
 
     } catch (error) {
-      console.error("Error guardando reserva:", error);
-      Alert.alert("Error", "Hubo un problema reservando los asientos. Intenta de nuevo.");
-      return;
+      errorMessageValidation(error, "Error de Reserva");
     }
 
-    // GUARDAR EN REDUX
+    // GUARDA EN REDUX
     dispatch(setBookingDetails({
       movieTitle: movieTitle,
       selectedSeats: mySelectedSeats,

@@ -4,8 +4,10 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { toggleTheme } from '../store/themeSlice';
 import { themePalette } from '../theme/colors';
 import { LogoutButton } from '../components/LogoutButton'; 
+import { useNavigation } from '@react-navigation/native';
 
 export const ProfileScreen = () => {
+  const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const { mode } = useAppSelector(state => state.theme);
   const colors = themePalette[mode];
@@ -31,7 +33,14 @@ export const ProfileScreen = () => {
           Tema: {mode === 'dark' ? '🌙 Oscuro' : '☀️ Claro'}
         </Text>
       </TouchableOpacity>
-
+      
+      <TouchableOpacity 
+        style={[styles.optionBtn, { borderColor: colors.border, marginTop: 10 }]} 
+        onPress={() => navigation.navigate('Preferences')}
+        >
+       <Text style={{ color: colors.text }}>❤️ Mis Gustos y Preferencias</Text>
+      </TouchableOpacity>
+      
       <View style={{ marginTop: 20 }}>
         <LogoutButton />
       </View>

@@ -10,6 +10,7 @@ import { CustomButton } from '../components/CustomButton';
 import { CustomInput } from '../components/CustomInput';
 import { colors, themePalette } from '../theme/colors'; 
 import { auth, db } from '../services/firebase';
+import { errorMessageValidation } from '../utils/errorHandling';
 
 export const LoginScreen = () => {
   const navigation = useNavigation<any>();
@@ -40,31 +41,20 @@ export const LoginScreen = () => {
 
   const handleLogin = async () => {
     if (!validateFormat()) return;
-
-    try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const userDocRef = doc(db, "users", user.uid);
-      const userDocSnap = await getDoc(userDocRef);
-
-      let userName = 'Usuario'; 
-      if (userDocSnap.exists()) {
-        userName = userDocSnap.data().name; 
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        const userDocRef = doc(db, "users", user.uid);
+        const userDocSnap = await getDoc(userDocRef);
+        let userName = 'Usuario';
+        if (userDocSnap.exists()) {
+        userName = userDocSnap.data().name;
       }
-
-      dispatch(setUser({ name: userName, email: email }));
-      navigation.replace('Main');
-
-    } catch (error: any) {
-      console.log(error);
-      if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        Alert.alert('Error', 'Correo o contraseña incorrectos.');
-      } else if (error.code === 'auth/too-many-requests') {
-        Alert.alert('Bloqueado', 'Demasiados intentos. Intenta más tarde.');
-      } else {
-        Alert.alert('Error', 'Falló el inicio de sesión: ' + error.message);
-      }
+        dispatch(setUser({ name: userName, email: email }));
+        navigation.replace('Main');
+        
+      } catch (error: any) {
+      errorMessageValidation(error, "Error de Inicio de Sesión");
     }
   };
 

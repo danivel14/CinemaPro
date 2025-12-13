@@ -9,6 +9,7 @@ import { colors } from '../theme/colors';
 import { createUserWithEmailAndPassword } from 'firebase/auth'; 
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../services/firebase'; 
+import { errorMessageValidation } from '../utils/errorHandling';
 
 export const RegisterScreen = () => {
   const navigation = useNavigation<any>();
@@ -84,15 +85,7 @@ export const RegisterScreen = () => {
       ]);
 
     } catch (error: any) {
-      console.log(error);
-      // Manejo de errores comunes de Firebase
-      if (error.code === 'auth/email-already-in-use') {
-        Alert.alert('Error', 'Ese correo ya está registrado.');
-      } else if (error.code === 'auth/weak-password') {
-        Alert.alert('Error', 'La contraseña es muy débil.');
-      } else {
-        Alert.alert('Error', 'No se pudo crear la cuenta: ' + error.message);
-      }
+      errorMessageValidation(error, "No se pudo crear la cuenta");
     }
   };
 
