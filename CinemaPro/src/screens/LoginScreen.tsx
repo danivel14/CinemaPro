@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { useAppDispatch } from '../store/hooks';
-import { setUser } from '../store/UserSlice'; 
-import { CustomButton } from '../components/CustomButton';
-import { colors } from '../theme/colors';
-import { CustomInput } from '../components/CustomInput';
 import { signInWithEmailAndPassword } from 'firebase/auth'; 
-import { doc, getDoc } from 'firebase/firestore'; 
+import { doc, getDoc } from 'firebase/firestore';
+import { useAppDispatch, useAppSelector } from '../store/hooks'; 
+import { setUser } from '../store/UserSlice'; 
+import { toggleTheme } from '../store/themeSlice';
+import { CustomButton } from '../components/CustomButton';
+import { CustomInput } from '../components/CustomInput';
+import { colors, themePalette } from '../theme/colors'; 
 import { auth, db } from '../services/firebase';
-
 
 export const LoginScreen = () => {
   const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
+  const themeMode = useAppSelector(state => state.theme.mode);
+  const themeColors = themePalette[themeMode];
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -40,29 +42,22 @@ export const LoginScreen = () => {
     if (!validateFormat()) return;
 
     try {
-      // intento de loguear con Firebase Auth
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // Buscar el nombre del usuario en Firestore (Base de datos)
-      // Usamos el UID para encontrar su documento
       const userDocRef = doc(db, "users", user.uid);
       const userDocSnap = await getDoc(userDocRef);
 
-      let userName = 'Usuario'; // Nombre por defecto si falla la DB
+      let userName = 'Usuario'; 
       if (userDocSnap.exists()) {
-        userName = userDocSnap.data().name; // Obtenemos el nombre real
+        userName = userDocSnap.data().name; 
       }
 
-      // 3. Actualizar Redux
       dispatch(setUser({ name: userName, email: email }));
-      
-      // 4. Entrar
       navigation.replace('Main');
 
     } catch (error: any) {
       console.log(error);
-      // Manejo de errores reales
       if (error.code === 'auth/invalid-credential' || error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
         Alert.alert('Error', 'Correo o contraseña incorrectos.');
       } else if (error.code === 'auth/too-many-requests') {
@@ -73,7 +68,6 @@ export const LoginScreen = () => {
     }
   };
 
-  // para modo invitado
   const handleGuest = () => {
     dispatch(setUser({ 
       name: 'Visitante', 
@@ -86,14 +80,14 @@ export const LoginScreen = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       <Image
         source={require('../../assets/logo_app.png')} 
         style={styles.logo}
         resizeMode="contain"
       />
 
-      <Text style={styles.title}>Cinema Pro</Text>
+      <Text style={[styles.title, { color: themeColors.primary }]}>Cinema Pro</Text>
 
       <CustomInput
         label="Correo Electrónico"
@@ -113,8 +107,7 @@ export const LoginScreen = () => {
         isPassword={true}
         error={errors.password}
       />
-
-      {/* BOTÓN PRINCIPAL: LOGIN */}
+    
       <CustomButton 
         title="Iniciar Sesión" 
         onPress={handleLogin} 
@@ -126,7 +119,6 @@ export const LoginScreen = () => {
         <View style={styles.line} />
       </View>
 
-      {/* BOTÓN SECUNDARIO: INVITADO */}
       <CustomButton 
         title="Continuar como Invitado" 
         variant="secondary" 
@@ -138,9 +130,15 @@ export const LoginScreen = () => {
         onPress={() => navigation.navigate('Register')}
       >
         <Text style={styles.footerText}>
-          ¿No tienes cuenta? <Text style={styles.linkText}>Regístrate aquí</Text>
+          ¿No tienes cuenta? <Text style={[styles.linkText, { color: themeColors.secondary }]}>Regístrate aquí</Text>
         </Text>
       </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => dispatch(toggleTheme())} style={{marginTop: 20}}>
+          <Text style={{color: themeColors.text}}>
+              Cambiar a modo {themeMode === 'dark' ? 'Claro' : 'Oscuro'}
+           </Text>
+        </TouchableOpacity>
 
       <Text style={styles.hintText}>
         (Demo: usuario@cine.com / password123)
@@ -152,7 +150,7 @@ export const LoginScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background, 
     padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
@@ -164,12 +162,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    color: colors.primary,
+    color: colors.primary, 
     fontWeight: 'bold',
     marginBottom: 40,
   },
-  
-  // Estilos del divisor "--- O ---"
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -186,7 +182,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     fontSize: 14,
   },
-
   registerLink: {
     marginTop: 20,
   },
@@ -195,7 +190,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   linkText: {
-    color: colors.secondary,
+    color: colors.secondary, 
     fontWeight: 'bold',
   },
   hintText: {

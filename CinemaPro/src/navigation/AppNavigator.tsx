@@ -8,16 +8,17 @@ import { DetailsScreen } from '../screens/DetailsScreen';
 import BookingScreen from '../screens/BookingScreen'; 
 import { SnacksScreen } from '../screens/SnacksScreen';
 import { CheckoutScreen } from '../screens/CheckoutScreen'; 
+import { TabNavigator } from './TabNavigator'; 
 
 const Stack = createNativeStackNavigator();
 
 export default function AppNavigator() {
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>    
         <Stack.Screen name="Auth" component={LoginScreen} />
         <Stack.Screen name="Register" component={RegisterScreen} />
-        <Stack.Screen name="Main" component={HomeScreen} />
+        <Stack.Screen name="Main" component={TabNavigator} />
         <Stack.Screen name="Details" component={DetailsScreen} />
         <Stack.Screen name="Booking" component={BookingScreen} />
         <Stack.Screen name="Snacks" component={SnacksScreen} />
