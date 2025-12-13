@@ -1,6 +1,27 @@
 {
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
-    "strict": true
-  }
+    /* Opciones Base: Configuración necesaria para React Native/TypeScript */
+    "strict": true,                 /* Impone buenas prácticas en el código */
+    "target": "es2020",             /* Versión de salida de JavaScript */
+    
+    /* Configuración para Módulos (la CLAVE para from 'react') */
+    "moduleResolution": "node",     /* CLAVE: Le dice a TS cómo buscar módulos, incluyendo node_modules */
+    "esModuleInterop": true,        /* Permite importaciones estilo CommonJS */
+    
+    /* Configuración para React (la CLAVE para JSX) */
+    "jsx": "react-native",          /* CLAVE: Especifica cómo TS debe manejar el JSX */
+    
+    /* Rutas de Archivos */
+    "outDir": "./dist",             /* Directorio de salida para los archivos compilados */
+    "rootDir": "./src",             /* Directorio donde está el código fuente */
+    "skipLibCheck": true            /* Opcional: Ignora errores de librerías de terceros (node_modules) */
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }
